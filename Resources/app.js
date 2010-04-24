@@ -1,3 +1,5 @@
+import ('md5_crypt.js');
+
 Titanium.UI.setBackgroundColor('#fff');
 
 Titanium.App.remote_url      = 'http://myreps.ca/mobile/reports_json';
