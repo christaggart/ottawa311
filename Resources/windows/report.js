@@ -2,7 +2,6 @@
  * New Report View
  * -------------------------------------------------------------------------------------------
  */
-
 var new_report = Titanium.UI.createView({
   size: {width: 320, height: 600 }
 });
@@ -37,7 +36,7 @@ galleryBtn.addEventListener("click", function(e) {
   	},
   	cancel:function() {},
   	error:function(error){
-  	  var a = Titanium.UI.createAlertDialog({ 
+  	  var a = Titanium.UI.createAlertDialog({
   	    title:'Uh Oh...',
   	    message: 'We had a problem reading from your photo gallery - please try again'
   	  });
@@ -195,11 +194,29 @@ Titanium.App.addEventListener('categoryChosen', function(e){
   submitBtn.opacity = 1;
 });
 
+
+
+
+var ind = Titanium.UI.createProgressBar({
+	width:200,
+	height:50,
+	min:0,
+	max:1,
+	value:0,
+	style:Titanium.UI.iPhone.ProgressBarStyle.BAR,
+	top:150,
+	message:'Upload Progress:',
+	font:{fontSize:12, fontWeight:'bold'},
+	color:'#fff'
+});
+
+
 scrollview.add(descLabel);
 scrollview.add(descField);
 scrollview.add(categoryField);
 scrollview.add(preview);
 scrollview.add(submitBtn);
+scrollview.add(ind);
 create_report.add(scrollview);
 create_report.add(categoryPicker);
 
@@ -226,36 +243,56 @@ function getCurrentLocation() {
       Titanium.App.curr_acc = e.coords.accuracy;
       Titanium.API.info('lat: '+ Titanium.App.curr_lat + " Lng: "+ Titanium.App.curr_lng);
     }
-	});  
+	});
 };
 
 //
 // Submitting the report
-// 
+//
 
 function submitReport() {
   Titanium.API.info("submitting report");
   var xhr = Titanium.Network.createHTTPClient();
-  
+
   // response from submit
   xhr.onload = function(e) {
     Titanium.App.fireEvent('reportSubmitted');
   };
-	
+
+  xhr.onsendstream = function(e) {
+  		ind.value = e.progress;
+  };
+
+
+  // build key
+  var bits = "chris@thinkit.ca:2010-04-16 14:43:00:" + Ti.App.app_key;
+  var m = Ti.Utils.md5HexDigest(bits);
+  var api_key = Ti.Utils.base64encode(m);
+
+  var device_id = Ti.Platform.id;
+  Ti.API.debug(bits);
+  Ti.API.debug(m);
+  Ti.API.debug(api_key);
   // create payload
   request = {
+    media:       Titanium.App.report_photo,
     title:       Titanium.App.report_category + " Report from iPhone user",
-    description: Titanium.App.report_desc,
-    category:    Titanium.App.report_category,
+    desc: Titanium.App.report_desc,
+    category_id: Titanium.App.report_category,
     lat:         Titanium.App.curr_lat,
-    lng:         Titanium.App.curr_lng
+    lon:         Titanium.App.curr_lng,
+    phone:       '613-555-1314',
+    email:       'chris@thinkit.ca',
+    name:        'chris',
+    api_key:     api_key,
+    device_id:   device_id
   };
-  
+
   Titanium.API.info("title: "+request.title);
   Titanium.API.info("desc: "+request.description);
   Titanium.API.info("lat: "+request.lat);
   Titanium.API.info("lng: "+request.lng);
-  
+
   xhr.open('POST', Titanium.App.remote_url);
   xhr.send(request);
 }
@@ -269,6 +306,8 @@ function submitReport() {
 
 Titanium.App.addEventListener('reportSubmitted', function(e){
   var win = Titanium.UI.createWindow();
-  
+  Ti.API.debug(e.responseText);
+  alert(e.responseText);
+
 });
 

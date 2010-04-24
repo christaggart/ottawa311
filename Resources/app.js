@@ -1,6 +1,7 @@
 Titanium.UI.setBackgroundColor('#fff');
 
-Titanium.App.remote_url      = 'http://ottawa311.heroku.com/reports'; 
+Titanium.App.remote_url      = 'http://myreps.ca/mobile/reports_json';
+Titanium.App.app_key         = '3GPogooM3F6GVQittnenwyhAX1PTCSjbMFWobYFhp626ouyQNbCEOuOvuoE6';
 Titanium.App.report_photo    = null;
 Titanium.App.report_thumb    = null;
 Titanium.App.report_category = null;
@@ -50,7 +51,7 @@ tabGroup.addEventListener('open',function() {
 	Titanium.UI.setBackgroundColor('#fff');
 });
 
-tabGroup.addTab(tab1);  
+tabGroup.addTab(tab1);
 tabGroup.addTab(tab2);
 tabGroup.setActiveTab(1);
 tabGroup.open({
